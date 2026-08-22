@@ -86,6 +86,23 @@ Resources:
             Path: /transaction
             Method: post
 
+  HistoryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: history/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FraudDetectionTable
+      Events:
+        History:
+          Type: Api
+          Properties:
+            Path: /transactions/{user_id}
+            Method: get
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
