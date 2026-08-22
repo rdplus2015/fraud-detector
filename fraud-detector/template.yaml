@@ -13,15 +13,16 @@ Globals:
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
       LogFormat: JSON
+
 Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: hello_world/
       Handler: app.lambda_handler
-      Runtime: python3.14
+      Runtime: python3.12
       Architectures:
-      - x86_64
+        - x86_64
       Events:
         HelloWorld:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -39,42 +40,58 @@ Resources:
       # that will act as a key somewhere (main table OR a GSI).
       # Does NOT include "free" attributes like amount, merchant, etc.
       AttributeDefinitions:
-        - AttributeName: PK           # will be the table's primary partition key
-          AttributeType: S            # S = String
-        - AttributeName: SK           # will be the table's sort key
+        - AttributeName: PK
           AttributeType: S
-        - AttributeName: status       # will be the GSI's partition key (status-index)
+        - AttributeName: SK
           AttributeType: S
-        - AttributeName: created_at   # will be the GSI's sort key (status-index)
+        - AttributeName: status
+          AttributeType: S
+        - AttributeName: created_at
           AttributeType: S
 
       # STEP 2 — Assign the role of each attribute for THE MAIN TABLE
       KeySchema:
         - AttributeName: PK
-          KeyType: HASH                # HASH = Partition Key
+          KeyType: HASH
         - AttributeName: SK
-          KeyType: RANGE               # RANGE = Sort Key
+          KeyType: RANGE
 
       # STEP 2bis — Same principle, but for a separate GSI:
-      # define its own KeySchema, reusing other declared attributes
+      # define its own KeySchema, reusing attributes declared above
       GlobalSecondaryIndexes:
         - IndexName: status-index
           KeySchema:
             - AttributeName: status
-              KeyType: HASH             # Partition Key OF THE GSI (not the table)
+              KeyType: HASH
             - AttributeName: created_at
-              KeyType: RANGE            # Sort Key OF THE GSI
+              KeyType: RANGE
           Projection:
-            ProjectionType: ALL         # copy all attributes into the GSI
+            ProjectionType: ALL
 
-
+  IngestorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ingestor/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FraudDetectionTable
+      Events:
+        Ingestor:
+          Type: Api
+          Properties:
+            Path: /transaction
+            Method: post
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World 
+    Description: API Gateway endpoint URL for Prod stage for Hello World
       function
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/hello/"
   HelloWorldFunction:
