@@ -45,5 +45,5 @@ export async function getTransactions(userId) {
         throw new Error("Failed to load transactions.");
     }
 
-    return res.json(); // notice: no `await` here — see note below
+    return res.json(); // notice: no `await` here
 }
