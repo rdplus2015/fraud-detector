@@ -1,9 +1,9 @@
 import './index.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/layout/navbar.tsx";
-import {TransactionForm} from "./components/transactionForm.jsx";
 import Profile from "./components/profile.jsx";
 import History from "./components/history.jsx";
+import TransactionForm from "./components/transactionForm.jsx";
 
 export default function App() {
     return (

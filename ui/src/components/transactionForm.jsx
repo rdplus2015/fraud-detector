@@ -6,7 +6,7 @@ const initialForm = { amount: "", merchant: "" };
 
 export default function TransactionForm() {
     const [form, setForm] = useState(initialForm);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // controls submit button disabled/spinner state
     const [feedback, setFeedback] = useState(null); // { type: "success" | "error", message: string }
 
     const handleChange = (e) => {
@@ -16,6 +16,7 @@ export default function TransactionForm() {
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
+    // Client-side validation before hitting the API
     const validate = () => {
         if (!form.amount || Number(form.amount) <= 0) {
             return "Amount is required and must be greater than 0.";
@@ -27,7 +28,7 @@ export default function TransactionForm() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // stop native browser form submission (page reload)
         setFeedback(null);
 
         const validationError = validate();
@@ -45,10 +46,12 @@ export default function TransactionForm() {
             });
 
             setFeedback({ type: "success", message: "Transaction recorded successfully." });
-            setForm(initialForm);
+            setForm(initialForm); // reset form fields after a successful submit
         } catch (err) {
+            // createTransaction throws on API/network error — message set here for the alert banner
             setFeedback({ type: "error", message: err.message });
         } finally {
+            // always runs, success or failure — re-enables the submit button
             setLoading(false);
         }
     };
@@ -96,6 +99,7 @@ export default function TransactionForm() {
                         />
                     </div>
 
+                    {/* Success/error banner, shown after a submit attempt */}
                     {feedback && (
                         <div
                             className={`alert ${
@@ -107,7 +111,7 @@ export default function TransactionForm() {
                     )}
 
                     <div className="card-actions justify-end mt-2">
-                        <button type="submit" className="btn btn-primary" disabled={loading}>
+                        <button type="submit" className="btn btn-neutral" disabled={loading}>
                             {loading && <span className="loading loading-spinner loading-sm" />}
                             {loading ? "Submitting..." : "Submit Transaction"}
                         </button>
