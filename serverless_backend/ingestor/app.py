@@ -13,6 +13,11 @@ def build_response(status_code, data):
     """Format a valid API Gateway Lambda response (body must be a JSON string)."""
     return {
         "statusCode": status_code,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+        },
         "body": json.dumps(data)
     }
 

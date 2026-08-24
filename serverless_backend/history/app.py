@@ -19,6 +19,11 @@ def decimal_default(obj):
 def build_response(status_code, data):
     return {
         "statusCode": status_code,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+        },
         "body": json.dumps(data, default=decimal_default)
     }
 
