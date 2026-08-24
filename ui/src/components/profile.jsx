@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import {CURRENT_USER_ID} from "../config.js";
 
 export default function Profile() {
     return (
@@ -12,7 +13,7 @@ export default function Profile() {
                 <div className="card-body gap-4">
                     <div>
                         <p className="text-sm text-base-content/60">User ID</p>
-                        <p className="text-lg font-medium">42</p>
+                        <p className="text-lg font-medium">{CURRENT_USER_ID}</p>
                     </div>
 
                     <div className="card-actions">
